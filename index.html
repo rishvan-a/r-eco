@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YouTube Clone</title>
+    <title>R-Eco</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -23,10 +23,48 @@
             color: white;
         }
 
+        .main-content {
+            display: flex;
+        }
+
+        .sidebar {
+            width: 200px;
+            background-color: #202020;
+            padding: 20px;
+        }
+
+        .sidebar h2 {
+            color: white;
+            text-align: center;
+        }
+
+        .category-btn {
+            display: block;
+            width: 100%;
+            padding: 10px 0;
+            margin: 10px 0;
+            background-color: #FF0000;
+            border: none;
+            color: white;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .category-btn:hover {
+            background-color: #D50000;
+        }
+
+        .content {
+            flex: 1;
+            padding: 20px;
+        }
+
         .search-bar {
             display: flex;
             justify-content: center;
-            margin: 20px;
+            margin-bottom: 20px;
         }
 
         input[type="text"] {
@@ -46,18 +84,15 @@
             border-radius: 4px;
         }
 
+        /* Video grid with larger selected video */
         .video-grid {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
-            padding: 20px;
         }
 
         .video-item {
-            width: 300px;
             cursor: pointer;
-            text-align: center;
         }
 
         .video-item img {
@@ -67,82 +102,179 @@
 
         .video-item p {
             color: white;
+            text-align: left;
             margin-top: 10px;
         }
 
-        #videoPlayer {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
+        .video-item.active img {
+            border: 3px solid #FF0000;
         }
 
-        iframe {
+        #videoPlayer {
+            margin-bottom: 20px;
+            padding: 0;
+        }
+
+        #videoPlayer iframe {
+            width: 100%;
+            height: 500px;
             border-radius: 10px;
             border: none;
+        }
+
+        .close-btn {
+            background-color: #FF0000;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        .small-video {
+            grid-column: span 1;
+            width: 100%;
+        }
+
+        .large-video {
+            grid-column: span 2;
+            width: 100%;
         }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>YouTube Clone</h1>
+        <h1>R-Eco</h1>
     </header>
 
-    <div class="search-bar">
-        <input type="text" id="searchQuery" placeholder="Search videos...">
-        <button id="searchButton">Search</button>
+    <div class="main-content">
+        <aside class="sidebar">
+            <h2>Categories</h2>
+            <h3>Songs</h3>
+            <ul>
+                <li><button data-category="Love Songs" class="category-btn">Love Songs</button></li>
+                <li><button data-category="Kuthu Songs" class="category-btn">Kuthu Songs</button></li>
+                <li><button data-category="Vibe Songs" class="category-btn">Vibe Songs</button></li>
+            </ul>
+            <h3>Educational</h3>
+            <button data-category="Educational" class="category-btn">Educational</button>
+        </aside>
+        
+
+        <section class="content">
+            <div class="search-bar">
+                <input type="text" id="searchQuery" placeholder="Search videos...">
+                <button id="searchButton">Search</button>
+            </div>
+
+            <div id="videoPlayer">
+                <button class="close-btn" id="closeButton" style="display: none;">Close Video</button>
+            </div>
+
+            <div id="videoGrid" class="video-grid"></div>
+        </section>
     </div>
 
-    <div id="videoGrid" class="video-grid"></div>
-
-    <div id="videoPlayer"></div>
-
     <script>
-        // Sample video data
+        // Sample video data with categories
         const videos = [
-            { title: 'love songs', videoID: 'AiD6SOOBKZI', thumbnail: 'https://i.ytimg.com/vi/AiD6SOOBKZI/hqdefault.jpg?sqp=-oaymwEbCKgBEF5IVfKriqkDDggBFQAAiEIYAXABwAEG&rs=AOn4CLBNbwgXYEU5rN5f1H1Ogo1ixdblYA' },
-            { title: 'Learn JavaScript', videoID: 'PkZNo7MFNFg', thumbnail: 'https://img.youtube.com/vi/PkZNo7MFNFg/hqdefault.jpg' },
-            { title: 'React JS Crash Course', videoID: 'w7ejDZ8SWv8', thumbnail: 'https://img.youtube.com/vi/w7ejDZ8SWv8/hqdefault.jpg' },
-            { title: 'CSS Flexbox Tutorial', videoID: 'JJSoEo8JSnc', thumbnail: 'https://img.youtube.com/vi/JJSoEo8JSnc/hqdefault.jpg' },
-            { title: 'Learn HTML in 12 Minutes', videoID: 'qz0aGYrrlhU', thumbnail: 'https://img.youtube.com/vi/qz0aGYrrlhU/hqdefault.jpg' }
+            { title: 'manasilayo', videoID: 'AiD6SOOBKZI', thumbnail: 'https://i.ytimg.com/vi/AiD6SOOBKZI/hqdefault.jpg', category: 'Vibe Songs' },
+            { title: 'Enna Solla pogirai', videoID: 'Gep0IzKTcFI', thumbnail: 'https://i.ytimg.com/vi/Gep0IzKTcFI/hqdefault.jpg', category: 'Love Songs' },
+            { title: 'Water packet', videoID: 'RgOEKdA2mlw', thumbnail: 'https://i.ytimg.com/vi/RgOEKdA2mlw/hqdefault.jpg', category: 'Love Songs' },
+            { title: 'Neela Nilave', videoID: 'nYEoxne_20Y', thumbnail: 'https://i.ytimg.com/vi/nYEoxne_20Y/hqdefault.jpg', category: 'Love Songs' }, 
+            { title: 'Oxygen', videoID: '7M9hc_PC_Vg', thumbnail: 'https://i.ytimg.com/vi/7M9hc_PC_Vg/hqdefault.jpg', category: 'Love Songs' },
+            { title: 'Thangamey', videoID: '4bZ-MAOLbGc', thumbnail: 'https://i.ytimg.com/vi/4bZ-MAOLbGc/hqdefault.jpg', category: 'Love Songs' },
+            { title: 'Azhagae Nee', videoID: 'nbobHjLZeTM', thumbnail: 'https://i.ytimg.com/vi/nbobHjLZeTM/hqdefault.jpg', category: 'Love Songs' },
+            { title: 'Kanmoodi ThiraKumbothu', videoID: 'U3uiWEOdudQ', thumbnail: 'https://i.ytimg.com/vi/U3uiWEOdudQ/hqdefault.jpg', category: 'Love Songs' },
+            { title: 'Kokkara Kokkarako', videoID: 'L1MLc8GvSLQ', thumbnail: 'https://i.ytimg.com/vi/L1MLc8GvSLQ/hqdefault.jpg', category: 'Vibe Songs' },
+            { title: 'Kaththazha Kannaala', videoID: 'c8Zm4DCLmC8', thumbnail: 'https://i.ytimg.com/vi/c8Zm4DCLmC8/hqdefault.jpg', category: 'Kuthu Songs' },
+            { title: 'Padichu Pathen', videoID: 'nttuyaJkypU', thumbnail: 'https://i.ytimg.com/vi/nttuyaJkypU/hqdefault.jpg', category: 'Kuthu Songs' },
+            { title: 'Kalasala ', videoID: '73NpsR6NF7E', thumbnail: 'https://i.ytimg.com/vi/73NpsR6NF7E/hqdefault.jpg', category: 'Kuthu Songs' },   
+            { title: 'React JS Crash Course', videoID: 'w7ejDZ8SWv8', thumbnail: 'https://img.youtube.com/vi/w7ejDZ8SWv8/hqdefault.jpg', category: 'Educational' },
+            { title: 'CSS Flexbox Tutorial', videoID: 'JJSoEo8JSnc', thumbnail: 'https://img.youtube.com/vi/JJSoEo8JSnc/hqdefault.jpg', category: 'Educational' },
         ];
 
-        // Display all videos on page load
+        // Display videos based on category
         function displayVideos(videoList) {
             const videoGrid = document.getElementById('videoGrid');
             videoGrid.innerHTML = ''; // Clear the grid
 
             videoList.forEach(video => {
                 const videoItem = document.createElement('div');
-                videoItem.classList.add('video-item');
+                videoItem.classList.add('video-item', 'small-video');
                 videoItem.innerHTML = `
                     <img src="${video.thumbnail}" alt="${video.title}">
                     <p>${video.title}</p>
                 `;
-                videoItem.addEventListener('click', () => playVideo(video.videoID));
+                videoItem.addEventListener('click', () => playVideo(video.videoID, videoItem));
                 videoGrid.appendChild(videoItem);
             });
         }
 
         // Function to play the selected video
-        function playVideo(videoID) {
+        function playVideo(videoID, selectedVideoItem) {
             const playerContainer = document.getElementById('videoPlayer');
             playerContainer.innerHTML = `
-                <iframe width="560" height="315" 
-                src="https://www.youtube.com/embed/${videoID}" 
+                <button class="close-btn" id="closeButton">Close Video</button>
+                <iframe src="https://www.youtube.com/embed/${videoID}" 
                 frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                 allowfullscreen></iframe>
             `;
+
+            // Show the close button
+            document.getElementById('closeButton').style.display = 'block';
+
+            // Change the size of the selected video
+            document.querySelectorAll('.video-item').forEach(item => {
+                item.classList.remove('large-video');
+                item.classList.add('small-video');
+                item.classList.remove('active');
+            });
+
+            selectedVideoItem.classList.remove('small-video');
+            selectedVideoItem.classList.add('large-video', 'active');
+
+            // Add event listener to close the video
+            document.getElementById('closeButton').addEventListener('click', closeVideo);
         }
 
-        // Search functionality
-        document.getElementById('searchButton').addEventListener('click', function() {
+        // Function to close the video
+        function closeVideo() {
+            const playerContainer = document.getElementById('videoPlayer');
+            playerContainer.innerHTML = ''; // Clear the video player
+            document.getElementById('closeButton').style.display = 'none'; // Hide the close button
+            displayVideos(videos); // Show all videos again
+        }
+
+        // Filter videos by category
+        function filterVideosByCategory(category) {
+            if (category === 'All') {
+                displayVideos(videos); // Show all videos
+            } else {
+                const filteredVideos = videos.filter(video => video.category === category);
+                displayVideos(filteredVideos);
+            }
+        }
+
+        // Add event listeners to category buttons
+        const categoryButtons = document.querySelectorAll('.category-btn');
+        categoryButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const category = button.getAttribute('data-category');
+                filterVideosByCategory(category);
+            });
+        });
+
+        // Event listener for search button
+        document.getElementById('searchButton').addEventListener('click', () => {
             const query = document.getElementById('searchQuery').value.toLowerCase();
             const filteredVideos = videos.filter(video => video.title.toLowerCase().includes(query));
             displayVideos(filteredVideos);
         });
 
-        // Initial load of all videos
+        // Initial display of videos
         displayVideos(videos);
     </script>
 </body>

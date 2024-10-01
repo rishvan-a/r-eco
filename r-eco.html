@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Clone</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #181818;
+            color: white;
+            margin: 0;
+        }
+
+        header {
+            background-color: #202020;
+            padding: 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            color: white;
+        }
+
+        .search-bar {
+            display: flex;
+            justify-content: center;
+            margin: 20px;
+        }
+
+        input[type="text"] {
+            width: 60%;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 10px;
+            margin-left: 10px;
+            background-color: #FF0000;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .video-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .video-item {
+            width: 300px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .video-item img {
+            width: 100%;
+            border-radius: 10px;
+        }
+
+        .video-item p {
+            color: white;
+            margin-top: 10px;
+        }
+
+        #videoPlayer {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        iframe {
+            border-radius: 10px;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>YouTube Clone</h1>
+    </header>
+
+    <div class="search-bar">
+        <input type="text" id="searchQuery" placeholder="Search videos...">
+        <button id="searchButton">Search</button>
+    </div>
+
+    <div id="videoGrid" class="video-grid"></div>
+
+    <div id="videoPlayer"></div>
+
+    <script>
+        // Sample video data
+        const videos = [
+            { title: 'love songs', videoID: 'AiD6SOOBKZI', thumbnail: 'https://i.ytimg.com/vi/AiD6SOOBKZI/hqdefault.jpg?sqp=-oaymwEbCKgBEF5IVfKriqkDDggBFQAAiEIYAXABwAEG&rs=AOn4CLBNbwgXYEU5rN5f1H1Ogo1ixdblYA' },
+            { title: 'Learn JavaScript', videoID: 'PkZNo7MFNFg', thumbnail: 'https://img.youtube.com/vi/PkZNo7MFNFg/hqdefault.jpg' },
+            { title: 'React JS Crash Course', videoID: 'w7ejDZ8SWv8', thumbnail: 'https://img.youtube.com/vi/w7ejDZ8SWv8/hqdefault.jpg' },
+            { title: 'CSS Flexbox Tutorial', videoID: 'JJSoEo8JSnc', thumbnail: 'https://img.youtube.com/vi/JJSoEo8JSnc/hqdefault.jpg' },
+            { title: 'Learn HTML in 12 Minutes', videoID: 'qz0aGYrrlhU', thumbnail: 'https://img.youtube.com/vi/qz0aGYrrlhU/hqdefault.jpg' }
+        ];
+
+        // Display all videos on page load
+        function displayVideos(videoList) {
+            const videoGrid = document.getElementById('videoGrid');
+            videoGrid.innerHTML = ''; // Clear the grid
+
+            videoList.forEach(video => {
+                const videoItem = document.createElement('div');
+                videoItem.classList.add('video-item');
+                videoItem.innerHTML = `
+                    <img src="${video.thumbnail}" alt="${video.title}">
+                    <p>${video.title}</p>
+                `;
+                videoItem.addEventListener('click', () => playVideo(video.videoID));
+                videoGrid.appendChild(videoItem);
+            });
+        }
+
+        // Function to play the selected video
+        function playVideo(videoID) {
+            const playerContainer = document.getElementById('videoPlayer');
+            playerContainer.innerHTML = `
+                <iframe width="560" height="315" 
+                src="https://www.youtube.com/embed/${videoID}" 
+                frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowfullscreen></iframe>
+            `;
+        }
+
+        // Search functionality
+        document.getElementById('searchButton').addEventListener('click', function() {
+            const query = document.getElementById('searchQuery').value.toLowerCase();
+            const filteredVideos = videos.filter(video => video.title.toLowerCase().includes(query));
+            displayVideos(filteredVideos);
+        });
+
+        // Initial load of all videos
+        displayVideos(videos);
+    </script>
+</body>
+</html>

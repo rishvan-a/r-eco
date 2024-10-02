@@ -84,7 +84,6 @@
             border-radius: 4px;
         }
 
-        /* Video grid with larger selected video */
         .video-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -104,10 +103,6 @@
             color: white;
             text-align: left;
             margin-top: 10px;
-        }
-
-        .video-item.active img {
-            border: 3px solid #FF0000;
         }
 
         #videoPlayer {
@@ -130,16 +125,18 @@
             border-radius: 4px;
             cursor: pointer;
             margin-bottom: 10px;
+            display: none; /* Initially hidden */
         }
 
-        .small-video {
-            grid-column: span 1;
-            width: 100%;
+        .loading {
+            color: white;
+            text-align: center;
+            margin: 20px 0;
         }
 
-        .large-video {
-            grid-column: span 2;
-            width: 100%;
+        .unavailable {
+            color: #FFA500; /* Warning color */
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -162,7 +159,6 @@
             <button data-category="Educational" class="category-btn">Educational</button>
         </aside>
         
-
         <section class="content">
             <div class="search-bar">
                 <input type="text" id="searchQuery" placeholder="Search videos...">
@@ -170,111 +166,128 @@
             </div>
 
             <div id="videoPlayer">
-                <button class="close-btn" id="closeButton" style="display: none;">Close Video</button>
+                <button class="close-btn" id="closeButton">Close Video</button>
+                <div id="iframeContainer"></div>
             </div>
 
             <div id="videoGrid" class="video-grid"></div>
+            <p id="loadingMessage" class="loading" style="display: none;">Loading...</p>
         </section>
     </div>
 
     <script>
-        // Sample video data with categories
+        const apiKey = 'AIzaSyAMI8wG8PinMqvvtbCvlFvOzK3fv0bqxEg';
+
         const videos = [
             { title: 'manasilayo', videoID: 'AiD6SOOBKZI', thumbnail: 'https://i.ytimg.com/vi/AiD6SOOBKZI/hqdefault.jpg', category: 'Vibe Songs' },
             { title: 'Enna Solla pogirai', videoID: 'Gep0IzKTcFI', thumbnail: 'https://i.ytimg.com/vi/Gep0IzKTcFI/hqdefault.jpg', category: 'Love Songs' },
             { title: 'Water packet', videoID: 'RgOEKdA2mlw', thumbnail: 'https://i.ytimg.com/vi/RgOEKdA2mlw/hqdefault.jpg', category: 'Love Songs' },
             { title: 'Neela Nilave', videoID: 'nYEoxne_20Y', thumbnail: 'https://i.ytimg.com/vi/nYEoxne_20Y/hqdefault.jpg', category: 'Love Songs' }, 
+            { title: 'Kadhal Vaithu', videoID: 'vnsEKd5z_rA', thumbnail: 'https://i.ytimg.com/vi/vnsEKd5z_rA/hqdefault.jpg', category: 'Love Songs' },
+            { title: 'Paakatha Ena', videoID: 'h8ftuxeMNek', thumbnail: 'https://i.ytimg.com/vi/h8ftuxeMNek/hqdefault.jpg', category: 'Love Songs' },
             { title: 'Oxygen', videoID: '7M9hc_PC_Vg', thumbnail: 'https://i.ytimg.com/vi/7M9hc_PC_Vg/hqdefault.jpg', category: 'Love Songs' },
             { title: 'Thangamey', videoID: '4bZ-MAOLbGc', thumbnail: 'https://i.ytimg.com/vi/4bZ-MAOLbGc/hqdefault.jpg', category: 'Love Songs' },
             { title: 'Azhagae Nee', videoID: 'nbobHjLZeTM', thumbnail: 'https://i.ytimg.com/vi/nbobHjLZeTM/hqdefault.jpg', category: 'Love Songs' },
             { title: 'Kanmoodi ThiraKumbothu', videoID: 'U3uiWEOdudQ', thumbnail: 'https://i.ytimg.com/vi/U3uiWEOdudQ/hqdefault.jpg', category: 'Love Songs' },
+            { title: 'Valayapathi', videoID: 'NnmHLUFfBOM', thumbnail: 'https://i.ytimg.com/vi/NnmHLUFfBOM/hqdefault.jpg', category: 'Vibe Songs' },
             { title: 'Kokkara Kokkarako', videoID: 'L1MLc8GvSLQ', thumbnail: 'https://i.ytimg.com/vi/L1MLc8GvSLQ/hqdefault.jpg', category: 'Vibe Songs' },
             { title: 'Kaththazha Kannaala', videoID: 'c8Zm4DCLmC8', thumbnail: 'https://i.ytimg.com/vi/c8Zm4DCLmC8/hqdefault.jpg', category: 'Kuthu Songs' },
             { title: 'Padichu Pathen', videoID: 'nttuyaJkypU', thumbnail: 'https://i.ytimg.com/vi/nttuyaJkypU/hqdefault.jpg', category: 'Kuthu Songs' },
-            { title: 'Kalasala ', videoID: '73NpsR6NF7E', thumbnail: 'https://i.ytimg.com/vi/73NpsR6NF7E/hqdefault.jpg', category: 'Kuthu Songs' },   
-            { title: 'React JS Crash Course', videoID: 'w7ejDZ8SWv8', thumbnail: 'https://img.youtube.com/vi/w7ejDZ8SWv8/hqdefault.jpg', category: 'Educational' },
-            { title: 'CSS Flexbox Tutorial', videoID: 'JJSoEo8JSnc', thumbnail: 'https://img.youtube.com/vi/JJSoEo8JSnc/hqdefault.jpg', category: 'Educational' },
+            { title: 'Pottu Thakku', videoID: 'BWx7MdyGr1A', thumbnail: 'https://i.ytimg.com/vi/BWx7MdyGr1A/hqdefault.jpg', category: 'Kuthu Songs' },
+            { title: 'Kuthu Vilakku', videoID: 'aPgwhVtCIDc', thumbnail: 'https://i.ytimg.com/vi/aPgwhVtCIDc/hqdefault.jpg', category: 'Kuthu Songs' }
         ];
 
-        // Display videos based on category
-        function displayVideos(videoList) {
+        // Function to display videos
+        function displayVideos(videos) {
             const videoGrid = document.getElementById('videoGrid');
-            videoGrid.innerHTML = ''; // Clear the grid
+            videoGrid.innerHTML = ''; // Clear previous videos
 
-            videoList.forEach(video => {
+            videos.forEach(video => {
                 const videoItem = document.createElement('div');
-                videoItem.classList.add('video-item', 'small-video');
+                videoItem.className = 'video-item';
                 videoItem.innerHTML = `
                     <img src="${video.thumbnail}" alt="${video.title}">
                     <p>${video.title}</p>
+                    <div class="${video.unavailable ? 'unavailable' : ''}"> ${video.unavailable ? 'Video unavailable' : ''}</div>
                 `;
-                videoItem.addEventListener('click', () => playVideo(video.videoID, videoItem));
+
+                videoItem.addEventListener('click', () => {
+                    playVideo(video.videoID);
+                });
+
                 videoGrid.appendChild(videoItem);
             });
         }
 
-        // Function to play the selected video
-        function playVideo(videoID, selectedVideoItem) {
-            const playerContainer = document.getElementById('videoPlayer');
-            playerContainer.innerHTML = `
-                <button class="close-btn" id="closeButton">Close Video</button>
-                <iframe src="https://www.youtube.com/embed/${videoID}" 
-                frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                allowfullscreen></iframe>
-            `;
-
-            // Show the close button
-            document.getElementById('closeButton').style.display = 'block';
-
-            // Change the size of the selected video
-            document.querySelectorAll('.video-item').forEach(item => {
-                item.classList.remove('large-video');
-                item.classList.add('small-video');
-                item.classList.remove('active');
-            });
-
-            selectedVideoItem.classList.remove('small-video');
-            selectedVideoItem.classList.add('large-video', 'active');
-
-            // Add event listener to close the video
-            document.getElementById('closeButton').addEventListener('click', closeVideo);
+        // Function to play video
+        function playVideo(videoID) {
+            const iframeContainer = document.getElementById('iframeContainer');
+            iframeContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoID}?autoplay=1" frameborder="0" allowfullscreen></iframe>`;
+            document.getElementById('videoPlayer').style.display = 'block';
+            document.getElementById('closeButton').style.display = 'block'; // Show close button
         }
 
-        // Function to close the video
-        function closeVideo() {
-            const playerContainer = document.getElementById('videoPlayer');
-            playerContainer.innerHTML = ''; // Clear the video player
-            document.getElementById('closeButton').style.display = 'none'; // Hide the close button
-            displayVideos(videos); // Show all videos again
-        }
+        // Function to fetch videos from YouTube API
+        async function fetchVideos(query) {
+            const loadingMessage = document.getElementById('loadingMessage');
+            loadingMessage.style.display = 'block'; // Show loading message
 
-        // Filter videos by category
-        function filterVideosByCategory(category) {
-            if (category === 'All') {
-                displayVideos(videos); // Show all videos
-            } else {
-                const filteredVideos = videos.filter(video => video.category === category);
-                displayVideos(filteredVideos);
+            try {
+                const response = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&q=${encodeURIComponent(query)}&maxResults=20&key=${apiKey}`);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok: ' + response.statusText);
+                }
+                const data = await response.json();
+
+                if (data.items.length === 0) {
+                    alert('No videos found for your search query.');
+                    return [];
+                }
+
+                return data.items.map(item => ({
+                    title: item.snippet.title,
+                    videoID: item.id.videoId,
+                    thumbnail: item.snippet.thumbnails.high.url,
+                    category: 'Search Results',
+                    unavailable: item.id.kind !== "youtube#video" // Check if the video is available
+                }));
+            } catch (error) {
+                console.error('Error fetching videos:', error);
+                alert('Failed to fetch videos. Please try again later.');
+                return [];
+            } finally {
+                loadingMessage.style.display = 'none'; // Hide loading message
             }
         }
 
-        // Add event listeners to category buttons
-        const categoryButtons = document.querySelectorAll('.category-btn');
-        categoryButtons.forEach(button => {
+        // Event listener for search button
+        document.getElementById('searchButton').addEventListener('click', async () => {
+            const query = document.getElementById('searchQuery').value;
+            if (query) {
+                const videos = await fetchVideos(query);
+                displayVideos(videos);
+            } else {
+                alert('Please enter a search query.');
+            }
+        });
+
+        // Event listener for close button
+        document.getElementById('closeButton').addEventListener('click', () => {
+            document.getElementById('videoPlayer').style.display = 'none'; // Hide video player
+            document.getElementById('iframeContainer').innerHTML = ''; // Clear the iframe
+            document.getElementById('closeButton').style.display = 'none'; // Hide close button
+        });
+
+        // Event listeners for category buttons
+        document.querySelectorAll('.category-btn').forEach(button => {
             button.addEventListener('click', () => {
                 const category = button.getAttribute('data-category');
-                filterVideosByCategory(category);
+                const filteredVideos = videos.filter(video => video.category === category);
+                displayVideos(filteredVideos);
             });
         });
 
-        // Event listener for search button
-        document.getElementById('searchButton').addEventListener('click', () => {
-            const query = document.getElementById('searchQuery').value.toLowerCase();
-            const filteredVideos = videos.filter(video => video.title.toLowerCase().includes(query));
-            displayVideos(filteredVideos);
-        });
-
-        // Initial display of videos
+        // Initial display of all videos
         displayVideos(videos);
     </script>
 </body>

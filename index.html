@@ -25,28 +25,22 @@
 
         .main-content {
             display: flex;
+            flex-direction: column;
         }
 
-        .sidebar {
-            width: 200px;
+        .categories-bar {
+            display: flex;
+            justify-content: center;
             background-color: #202020;
-            padding: 20px;
-        }
-
-        .sidebar h2 {
-            color: white;
-            text-align: center;
+            padding: 10px 0;
         }
 
         .category-btn {
-            display: block;
-            width: 100%;
-            padding: 10px 0;
-            margin: 10px 0;
+            margin: 0 10px;
             background-color: #FF0000;
             border: none;
             color: white;
-            text-align: center;
+            padding: 10px 20px;
             cursor: pointer;
             border-radius: 4px;
             font-size: 14px;
@@ -146,19 +140,14 @@
         <h1>R-Eco</h1>
     </header>
 
+    <!-- Categories bar at the top -->
+    <div class="categories-bar">
+        <button data-category="Love Songs" class="category-btn">Love Songs</button>
+        <button data-category="Kuthu Songs" class="category-btn">Kuthu Songs</button>
+        <button data-category="Vibe Songs" class="category-btn">Vibe Songs</button>
+    </div>
+
     <div class="main-content">
-        <aside class="sidebar">
-            <h2>Categories</h2>
-            <h3>Songs</h3>
-            <ul>
-                <li><button data-category="Love Songs" class="category-btn">Love Songs</button></li>
-                <li><button data-category="Kuthu Songs" class="category-btn">Kuthu Songs</button></li>
-                <li><button data-category="Vibe Songs" class="category-btn">Vibe Songs</button></li>
-            </ul>
-            <h3>Educational</h3>
-            <button data-category="Educational" class="category-btn">Educational</button>
-        </aside>
-        
         <section class="content">
             <div class="search-bar">
                 <input type="text" id="searchQuery" placeholder="Search videos...">
@@ -174,7 +163,6 @@
             <p id="loadingMessage" class="loading" style="display: none;">Loading...</p>
         </section>
     </div>
-
     <script>
         const apiKey = 'AIzaSyAMI8wG8PinMqvvtbCvlFvOzK3fv0bqxEg';
 

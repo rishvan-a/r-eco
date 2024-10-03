@@ -245,7 +245,7 @@
 
                     allVideos = allVideos.concat(fetchedVideos); // Concatenate new results
                     nextPageToken = data.nextPageToken; // Get the next page token
-                } while (nextPageToken && allVideos.length < 100); // Limit total results to 100
+                } while (nextPageToken && allVideos.length < 50); // Limit total results to 100
 
                 return allVideos;
             } catch (error) {

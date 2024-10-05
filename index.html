@@ -4,23 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>R-Eco</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Poppins', sans-serif;
             background-color: #181818;
             color: white;
             margin: 0;
+            padding: 0;
         }
 
         header {
-            background-color: #202020;
+            background: linear-gradient(45deg, #044d1d, #191414);
             padding: 20px;
             text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
         }
 
         header h1 {
             margin: 0;
-            color: white;
+            color: #fff;
+            font-size: 2.5em;
+            font-weight: 600;
         }
 
         .main-content {
@@ -37,17 +42,19 @@
 
         .category-btn {
             margin: 0 10px;
-            background-color: #FF0000;
+            background: linear-gradient(135deg, #FF416C, #FF4B2B);
             border: none;
             color: white;
-            padding: 10px 20px;
+            padding: 12px 25px;
             cursor: pointer;
-            border-radius: 4px;
-            font-size: 14px;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: background 0.3s ease;
         }
 
         .category-btn:hover {
-            background-color: #D50000;
+            background-color: #FF4B2B;
+            transform: scale(1.05);
         }
 
         .content {
@@ -63,40 +70,57 @@
 
         input[type="text"] {
             width: 60%;
-            padding: 10px;
-            border: none;
-            border-radius: 4px;
+            padding: 12px;
+            border: 2px solid #FF416C;
+            border-radius: 30px;
+            font-size: 16px;
         }
 
         button {
-            padding: 10px;
+            padding: 12px;
             margin-left: 10px;
-            background-color: #FF0000;
+            background: linear-gradient(135deg, #FF416C, #FF4B2B);
             border: none;
             color: white;
             cursor: pointer;
-            border-radius: 4px;
+            border-radius: 30px;
+            font-size: 16px;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #FF4B2B;
         }
 
         .video-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
+            padding: 20px;
         }
 
         .video-item {
-            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            border-radius: 15px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
         .video-item img {
             width: 100%;
-            border-radius: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .video-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
         }
 
         .video-item p {
-            color: white;
-            text-align: left;
-            margin-top: 10px;
+            margin: 10px 0;
+            text-align: center;
+            font-size: 18px;
         }
 
         #videoPlayer {
@@ -112,14 +136,19 @@
         }
 
         .close-btn {
-            background-color: #FF0000;
+            background-color: #FF416C;
             color: white;
             padding: 10px;
             border: none;
-            border-radius: 4px;
+            border-radius: 8px;
             cursor: pointer;
             margin-bottom: 10px;
-            display: none; /* Initially hidden */
+            display: none;
+            transition: background 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background-color: #FF4B2B;
         }
 
         .loading {
@@ -129,7 +158,7 @@
         }
 
         .unavailable {
-            color: #FFA500; /* Warning color */
+            color: #FFA500;
             margin-top: 10px;
         }
     </style>
@@ -167,7 +196,7 @@
         const apiKey = 'AIzaSyBtbMkgonHjWEXeg7rh1CGiRqEdvY5CeLY';
 
         const videos = [
-            { title: 'manasilayo', videoID: 'AiD6SOOBKZI', thumbnail: 'https://i.ytimg.com/vi/AiD6SOOBKZI/hqdefault.jpg', category: 'Vibe Songs' },
+        { title: 'manasilayo', videoID: 'AiD6SOOBKZI', thumbnail: 'https://i.ytimg.com/vi/AiD6SOOBKZI/hqdefault.jpg', category: 'Vibe Songs' },
             { title: 'Enna Solla pogirai', videoID: 'Gep0IzKTcFI', thumbnail: 'https://i.ytimg.com/vi/Gep0IzKTcFI/hqdefault.jpg', category: 'Love Songs' },
             { title: 'Water packet', videoID: 'RgOEKdA2mlw', thumbnail: 'https://i.ytimg.com/vi/RgOEKdA2mlw/hqdefault.jpg', category: 'Love Songs' },
             { title: 'Neela Nilave', videoID: 'nYEoxne_20Y', thumbnail: 'https://i.ytimg.com/vi/nYEoxne_20Y/hqdefault.jpg', category: 'Love Songs' }, 
@@ -183,9 +212,9 @@
             { title: 'Padichu Pathen', videoID: 'nttuyaJkypU', thumbnail: 'https://i.ytimg.com/vi/nttuyaJkypU/hqdefault.jpg', category: 'Kuthu Songs' },
             { title: 'Pottu Thakku', videoID: 'BWx7MdyGr1A', thumbnail: 'https://i.ytimg.com/vi/BWx7MdyGr1A/hqdefault.jpg', category: 'Kuthu Songs' },
             { title: 'Kuthu Vilakku', videoID: 'aPgwhVtCIDc', thumbnail: 'https://i.ytimg.com/vi/aPgwhVtCIDc/hqdefault.jpg', category: 'Kuthu Songs' }
+            // Add more videos...
         ];
 
-        // Function to display videos
         function displayVideos(videos) {
             const videoGrid = document.getElementById('videoGrid');
             videoGrid.innerHTML = ''; // Clear previous videos
@@ -207,7 +236,6 @@
             });
         }
 
-        // Function to play video
         function playVideo(videoID) {
             const iframeContainer = document.getElementById('iframeContainer');
             iframeContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoID}?autoplay=1" frameborder="0" allowfullscreen></iframe>`;
@@ -215,7 +243,6 @@
             document.getElementById('closeButton').style.display = 'block'; // Show close button
         }
 
-        // Function to fetch videos from YouTube API
         async function fetchVideos(query) {
             const loadingMessage = document.getElementById('loadingMessage');
             loadingMessage.style.display = 'block'; // Show loading message
@@ -240,12 +267,12 @@
                         videoID: item.id.videoId,
                         thumbnail: item.snippet.thumbnails.high.url,
                         category: 'Search Results',
-                        unavailable: item.id.kind !== "youtube#video" // Check if the video is available
+                        unavailable: item.id.kind !== "youtube#video"
                     }));
 
-                    allVideos = allVideos.concat(fetchedVideos); // Concatenate new results
-                    nextPageToken = data.nextPageToken; // Get the next page token
-                } while (nextPageToken && allVideos.length < 50); // Limit total results to 100
+                    allVideos = allVideos.concat(fetchedVideos);
+                    nextPageToken = data.nextPageToken;
+                } while (nextPageToken && allVideos.length < 100);
 
                 return allVideos;
             } catch (error) {
@@ -257,15 +284,24 @@
             }
         }
 
-
-        // Event listener for search button
-        document.getElementById('searchButton').addEventListener('click', async () => {
+        // Search function
+        async function performSearch() {
             const query = document.getElementById('searchQuery').value;
             if (query) {
                 const videos = await fetchVideos(query);
                 displayVideos(videos);
             } else {
                 alert('Please enter a search query.');
+            }
+        }
+
+        // Event listener for search button
+        document.getElementById('searchButton').addEventListener('click', performSearch);
+
+        // Event listener for pressing Enter in the search bar
+        document.getElementById('searchQuery').addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                performSearch();
             }
         });
 
